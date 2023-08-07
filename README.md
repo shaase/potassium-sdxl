@@ -1,4 +1,4 @@
-# STable Diffusion XL Base v1.0 App
+# Stable Diffusion XL Base v1.0 App
 
 Implementation of [stabilityai/stable-diffusion-xl-base-1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
 This is a Potassium HTTP server, created with `banana init` CLI
