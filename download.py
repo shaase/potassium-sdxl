@@ -2,12 +2,13 @@
 import torch
 from diffusers import DiffusionPipeline
 
+
 def download_model():
     # do a dry run of loading the huggingface model, which will download weights
     base = DiffusionPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-base-1.0", 
-        torch_dtype=torch.float16, 
-        use_safetensors=True, 
+        "stabilityai/stable-diffusion-xl-base-1.0",
+        torch_dtype=torch.float16,
+        use_safetensors=True,
         variant="fp16"
     )
     refiner = DiffusionPipeline.from_pretrained(
@@ -18,6 +19,7 @@ def download_model():
         use_safetensors=True,
         variant="fp16",
     )
+
 
 if __name__ == "__main__":
     download_model()

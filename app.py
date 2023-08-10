@@ -19,6 +19,8 @@ def init():
     )
     base.to("cuda")
     base.enable_xformers_memory_efficient_attention()
+    base.unet = torch.compile(
+        base.unet, mode="reduce-overhead", fullgraph=True)
 
     refiner = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -29,6 +31,8 @@ def init():
         variant="fp16",
     )
     refiner.to("cuda")
+    refiner.unet = torch.compile(
+        refiner.unet, mode="reduce-overhead", fullgraph=True)
 
     context = {
         "model": base,
@@ -46,17 +50,16 @@ def handler(context: dict, request: Request) -> Response:
     refiner = context.get("refiner")
 
     prompt = request.json.get("prompt")
-    width = request.json.get("width")
-    height = request.json.get("height")
+    width = request.json.get("width", 1024)
+    height = request.json.get("height", 1024)
     num_steps = request.json.get("num_steps", 50)
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
     init_image = request.json.get("image")
+    print(request.json)
 
     if init_image:
         image = model(
             prompt=prompt,
-            width=width,
-            height=height,
             num_inference_steps=num_steps,
             denoising_end=high_noise_frac,
             image=init_image,
@@ -74,8 +77,6 @@ def handler(context: dict, request: Request) -> Response:
 
     image = refiner(
         prompt=prompt,
-        width=width,
-        height=height,
         num_inference_steps=num_steps,
         denoising_start=high_noise_frac,
         image=image,
