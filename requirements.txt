@@ -6,4 +6,3 @@ invisible-watermark
 accelerate
 safetensors
 xformers
-PIL
