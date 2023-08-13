@@ -21,15 +21,15 @@ def init():
     base.enable_xformers_memory_efficient_attention()
     base.unet = torch.compile(base.unet, mode="reduce-overhead", fullgraph=True)
 
-    imager = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-base-1.0",
-        torch_dtype=torch.float16,
-        use_safetensors=True,
-        variant="fp16",
-    )
-    imager.to("cuda")
-    imager.enable_xformers_memory_efficient_attention()
-    imager.unet = torch.compile(imager.unet, mode="reduce-overhead", fullgraph=True)
+    # imager = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+    #     "stabilityai/stable-diffusion-xl-base-1.0",
+    #     torch_dtype=torch.float16,
+    #     use_safetensors=True,
+    #     variant="fp16",
+    # )
+    # imager.to("cuda")
+    # imager.enable_xformers_memory_efficient_attention()
+    # imager.unet = torch.compile(imager.unet, mode="reduce-overhead", fullgraph=True)
 
     refiner = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -42,7 +42,7 @@ def init():
     refiner.to("cuda")
     refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
-    context = {"model": base, "imager": imager, "refiner": refiner}
+    context = {"model": base,  "refiner": refiner}
 
     return context
 
@@ -51,7 +51,7 @@ def init():
 @app.handler("/")
 def handler(context: dict, request: Request) -> Response:
     model = context.get("model")
-    imager = context.get("imager")
+    # imager = context.get("imager")
     refiner = context.get("refiner")
 
     prompt = request.json.get("prompt")
@@ -59,21 +59,31 @@ def handler(context: dict, request: Request) -> Response:
     height = request.json.get("height", 1024)
     num_steps = request.json.get("num_steps", 50)
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
-    init_image = request.json.get("image")
+    # init_image = request.json.get("image")
 
-    if init_image:
-        im_bytes = base64.b64decode(init_image)
-        im_file = BytesIO(im_bytes)
-        im_input = Image.open(im_file)
-        image = imager(
-            prompt=prompt,
-            image=im_input,
-            num_inference_steps=num_steps,
-            denoising_end=high_noise_frac,
-            output_type="latent",
-        ).images
-    else:
-        image = model(
+    # if init_image:
+    #     im_bytes = base64.b64decode(init_image)
+    #     im_file = BytesIO(im_bytes)
+    #     im_input = Image.open(im_file)
+    #     image = imager(
+    #         prompt=prompt,
+    #         image=im_input,
+    #         num_inference_steps=num_steps,
+    #         denoising_end=high_noise_frac,
+    #         output_type="latent",
+    #     ).images
+    # else:
+    #     image = model(
+    #         prompt=prompt,
+    #         width=width,
+    #         height=height,
+    #         num_inference_steps=num_steps,
+    #         denoising_end=high_noise_frac,
+    #         output_type="latent",
+    #     ).images
+
+        
+    image = model(
             prompt=prompt,
             width=width,
             height=height,
