@@ -42,12 +42,13 @@ def handler(context: dict, request: Request) -> Response:
     width = request.json.get("prompt", 1024)
     num_steps = request.json.get("num_steps", 50)
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
+    print(width)
 
     model = context.get("model")
     refiner = context.get("refiner")
     image = model(
         prompt=prompt,
-        width=width,
+        width=1344,
         height=768,
         num_inference_steps=num_steps,
         denoising_end=high_noise_frac,
