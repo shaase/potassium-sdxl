@@ -39,6 +39,7 @@ def init():
 @app.handler("/")
 def handler(context: dict, request: Request) -> Response:
     prompt = request.json.get("prompt")
+    width = request.json.get("prompt", 1024)
     num_steps = request.json.get("num_steps", 50)
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
 
@@ -61,7 +62,7 @@ def handler(context: dict, request: Request) -> Response:
     ).images[0]
 
     buffered  = BytesIO()
-    image.save(buffered ,format="JPEG")
+    image.save(buffered ,format="PNG")
     output = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
     return Response(
