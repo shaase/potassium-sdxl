@@ -47,7 +47,7 @@ def handler(context: dict, request: Request) -> Response:
     refiner = context.get("refiner")
     image = model(
         prompt=prompt,
-        width=1344,
+        width=width,
         height=768,
         num_inference_steps=num_steps,
         denoising_end=high_noise_frac,
@@ -62,7 +62,7 @@ def handler(context: dict, request: Request) -> Response:
     ).images[0]
 
     buffered  = BytesIO()
-    image.save(buffered ,format="PNG")
+    image.save(buffered ,format="JPG")
     output = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
     return Response(
