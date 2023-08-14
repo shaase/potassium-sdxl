@@ -39,10 +39,11 @@ def init():
 @app.handler("/")
 def handler(context: dict, request: Request) -> Response:
     prompt = request.json.get("prompt")
-    width = request.json.get("prompt", 1024)
+    width = request.json.get("width", 1024)
+    height = request.json.get("height", 1024)
     num_steps = request.json.get("num_steps", 50)
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
-    print(width)
+    print(request.json)
 
     model = context.get("model")
     refiner = context.get("refiner")
