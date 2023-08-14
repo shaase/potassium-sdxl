@@ -46,6 +46,8 @@ def handler(context: dict, request: Request) -> Response:
     refiner = context.get("refiner")
     image = model(
         prompt=prompt,
+        width=1344,
+        height=768,
         num_inference_steps=num_steps,
         denoising_end=high_noise_frac,
         output_type="latent",
