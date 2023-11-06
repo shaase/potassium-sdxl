@@ -3,24 +3,19 @@
 Implementation of [stabilityai/stable-diffusion-xl-base-1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
 This is a Potassium HTTP server, created with `banana init` CLI
 
-### Testing
+## Testing
 
-Start a local dev server with `banana dev`
+1. `. ./venv/bin/activate`
+2. `pip install -r requirements.txt`
+3. `python3 download.py`
+4. `python3 app.py m1`
+5. `deactivate` (when finished)
 
-### Deployment
+### Test with CURL
 
-1. Create empty repo on [Github](https://github.com)
-2. Push this repo to github
-
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"prompt": "Software developers start with a Hello, [MASK]! script."}' \
+    http://localhost:8000/
 ```
-git remote add origin https://github.com/{username}/{repo-name}.git
-```
-
-3. [Log into Banana](https://app.banana.dev/onboard)
-4. Select this repo to build and deploy!
-
-## Example Output
-
-Example output for prompt: "An astronaut riding a green horse"
-
-![alt text](demo.jpg)

@@ -1,3 +1,4 @@
+import sys
 from potassium import Potassium, Request, Response
 import torch
 import base64
@@ -15,8 +16,6 @@ def init():
         use_safetensors=True, 
         variant="fp16"
     )
-    base.to("cuda")
-    base.enable_xformers_memory_efficient_attention()
 
     refiner = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -26,7 +25,17 @@ def init():
         use_safetensors=True,
         variant="fp16",
     )
-    refiner.to("cuda")
+
+
+    platform = "m1" in sys.argv[1:] and "m1" or "cuda"
+    if platform == "cuda":
+        base.to("cuda")
+        refiner.to("cuda")
+        base.enable_xformers_memory_efficient_attention()
+    elif platform == "m1":
+        base.to("mps")
+        refiner.to("mps")
+        base.enable_attention_slicing()
 
     context = {
         "model": base,
@@ -49,8 +58,8 @@ def handler(context: dict, request: Request) -> Response:
     refiner = context.get("refiner")
     image = model(
         prompt=prompt,
-        width=1344,
-        height=768,
+        width=width,
+        height=height,
         num_inference_steps=num_steps,
         denoising_end=high_noise_frac,
         output_type="latent",
@@ -64,7 +73,7 @@ def handler(context: dict, request: Request) -> Response:
     ).images[0]
 
     buffered  = BytesIO()
-    image.save(buffered, format="JPEG")
+    image.save(buffered, format="PNG")
     output = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
     return Response(

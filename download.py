@@ -1,6 +1,6 @@
 # This file runs during container build time to get model weights built into the container
 import torch
-from diffusers import DiffusionPipeline
+from diffusers import DiffusionPipeline, StableDiffusionXLImg2ImgPipeline
 
 def download_model():
     # do a dry run of loading the huggingface model, which will download weights
@@ -10,7 +10,7 @@ def download_model():
         use_safetensors=True, 
         variant="fp16"
     )
-    refiner = DiffusionPipeline.from_pretrained(
+    refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
         text_encoder_2=base.text_encoder_2,
         vae=base.vae,
