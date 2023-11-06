@@ -4,7 +4,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv() 
 
-def upload_payload_to_s3(payload):
+def save_to_s3(payload):
     # Set your AWS credentials as environment variables
     aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
     aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
