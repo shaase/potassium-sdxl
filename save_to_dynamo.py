@@ -11,7 +11,7 @@ def save_to_dynamo(Item):
     TableName = 'TableName'
 
     # Initialize the DynamoDB client
-    dynamodb = boto3.client('dynamodb')
+    dynamodb = boto3.client('dynamodb', aws_access_key_id=aws_access_key_id,  aws_secret_access_key=aws_secret_access_key)
 
     # Save the data to DynamoDB
     # item = dynamodb.put_item(TableName=TableName, Item={'fruitName':{'S':'Banana'},'key2':{'N':'value2'}})
