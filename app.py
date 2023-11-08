@@ -2,6 +2,7 @@ import sys
 from potassium import Potassium, Request, Response
 import torch
 import base64
+from datetime import datetime
 from io import BytesIO
 from diffusers import DiffusionPipeline
 
@@ -26,7 +27,6 @@ def init():
         variant="fp16",
     )
 
-
     platform = "m1" in sys.argv[1:] and "m1" or "cuda"
     if platform == "cuda":
         base.to("cuda")
@@ -50,7 +50,9 @@ def handler(context: dict, request: Request) -> Response:
     prompt = request.json.get("prompt")
     width = request.json.get("width", 1024)
     height = request.json.get("height", 1024)
-    num_steps = request.json.get("num_steps", 50)
+    num_inference_steps = request.json.get("num_inference_steps", 50)
+    guidance_scale = request.json.get("guidance_scale", 0.5)
+    negative_prompt = request.json.get("negative_prompt", "low quality")
     high_noise_frac = request.json.get("high_noise_frac", 0.8)
     print(request.json)
 
@@ -60,21 +62,29 @@ def handler(context: dict, request: Request) -> Response:
         prompt=prompt,
         width=width,
         height=height,
-        num_inference_steps=num_steps,
+        num_inference_steps=num_inference_steps,
+        guidance_scale=guidance_scale,
         denoising_end=high_noise_frac,
+        negative_prompt=negative_prompt,
         output_type="latent",
     ).images
 
     image = refiner(
         prompt=prompt,
-        num_inference_steps=num_steps,
+        num_inference_steps=num_inference_steps,
         denoising_start=high_noise_frac,
+        negative_prompt=negative_prompt,
         image=image,
     ).images[0]
 
     buffered  = BytesIO()
     image.save(buffered, format="PNG")
     output = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+    # filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.%f")[:-3] + ".png"
+    # image_bytes = str.encode(output)
+    # with open(filename, "wb") as fh:
+    #   fh.write(base64.decodebytes(image_bytes))
 
     return Response(
         json = {"output": output}, 
