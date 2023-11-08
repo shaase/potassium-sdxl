@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y git libgl1-mesa-glx libglib2.0-0
 RUN pip3 install --upgrade pip
 ADD requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
+RUN pip3 install typing-extensions --upgrade
 
 # Add your model weight files 
 # (in this case we have a python script)
